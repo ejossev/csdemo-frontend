@@ -1,6 +1,7 @@
 import React, { useState, useContext, useCallback, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { login, getLoggedUser } from "../utils/Auth"
+import { SIGNUP_URL } from "../utils/Apis"
 
 import Alert from '@mui/material/Alert'
 import Grid from '@mui/material/Grid'
@@ -18,6 +19,8 @@ import Fade from '@mui/material/Fade'
 import SvgIcon from '@mui/material/SvgIcon'
 import Collapse from '@mui/material/Collapse'
 import { ButtonUnstyled } from "@mui/base";
+import Checkbox from '@mui/material/Checkbox';
+
 
 
 export default function Login({ allProducts }) {
@@ -29,16 +32,12 @@ export default function Login({ allProducts }) {
 
   useEffect(() => {
     setUser(getLoggedUser()) 
-    console.log("setting listener")
     window.addEventListener('storage', (event) => {
-      console.log("listener called")
       setUser(getLoggedUser())   
     });
   }, [])
 
   const redirectIfLogged = useCallback(() => {
-    console.log(user)
-    console.log(getLoggedUser())
     if (!!user?.username)
       navigate("/")
   }, [user, navigate])
@@ -46,24 +45,43 @@ export default function Login({ allProducts }) {
 
   const handleLogin = useCallback(async (event) => {
     event.preventDefault()
-    setUpdate(true)
-    const rv = await login(
-      event.currentTarget.username.value,
-      event.currentTarget.password.value
-    )
-    console.log(rv)
-    if (!rv) {
-      setErrorMsg("Error logging in")
+    if (event.currentTarget.register.checked) {
+      let res = await fetch(SIGNUP_URL, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 
+          username: event.currentTarget.username.value, 
+          password: event.currentTarget.password.value })
+      })
+    
+      if (res.status == 200) {
+        navigate("/")
+      } else {
+        setErrorMsg("Error signing up")
+      }
     } else {
-      navigate("/")
+      setUpdate(true)
+      const rv = await login(
+        event.currentTarget.username.value,
+        event.currentTarget.password.value
+      )
+      if (!rv) {
+        setErrorMsg("Error logging in")
+      } else {
+        navigate("/")
+      }
     }
+
   }, [setUpdate])
 
 
   return (
     <>
       <Container sx={{ mt: 6 }}>
-        <Grid container justifyContent="space-between" spacing={2}>
+        <Grid container justifyContent="center" spacing={2} alignItems="center">
           <Grid item>
             <Typography variant="h5" fontWeight={500}>
               Log in
@@ -87,6 +105,19 @@ export default function Login({ allProducts }) {
                 name="password"
                 type="password"
               />
+              <Grid
+                container
+                alignItems="left"
+                justifyContent="left"
+              >
+                <Grid item sx={{ display: { xs: 'none', md: 'flex' } }} alignItems="center">
+                  <Checkbox label="register" name="register"/>
+                </Grid>
+                <Grid item sx={{ display: { xs: 'none', md: 'flex' } }} alignItems="center">
+                  <Typography variant ="body">Create new account</Typography>
+                </Grid>
+              </Grid>
+              
               <Button type="submit" variant="outlined">
                 Submit
               </Button>

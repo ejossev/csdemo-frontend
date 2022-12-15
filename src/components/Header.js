@@ -78,7 +78,6 @@ const Header = () => {
     navigate("/edit")
   }
 
-  useEffect(()=>{console.log(user)}, [user])
 
   return (
     <NavbarBox>
@@ -106,7 +105,7 @@ const Header = () => {
           ) : (
             <Grid item sx={{ display: { xs: 'none', md: 'flex' } }}>
               <Link href="/login" onClick={handleNavLogin}>
-                Login
+                Signin/Signup
               </Link>
             </Grid>
           )}

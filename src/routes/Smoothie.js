@@ -4,7 +4,7 @@ import { useParams } from 'react-router'
 import { useNavigate } from "react-router-dom";
 import { SMOOTHY_URL_BASE } from "../utils/Apis"
 import { changeCart, getCart } from '../utils/Cart'
-import { getLoggedUser } from "../utils/Auth";
+import { getLoggedUser, authorizedFetch } from "../utils/Auth";
 
 
 import Paper from '@mui/material/Paper'
@@ -80,11 +80,24 @@ export default function Smoothie() {
       navigate(`/edit/${id}`)
   }, [cart])
 
+  const handleClickDelete = useCallback(
+    async (e) => {
+      e.preventDefault()
+      const res = await authorizedFetch(
+        SMOOTHY_URL_BASE + "/" + id, 
+        {method: "DELETE"})
+      if (res.status == 200) {
+        navigate("/")
+      } else {
+        console.log(res)
+      }
+  }, [cart])
+
   const updateCallback = useCallback(() => {
     setCart(getCart())
     const user = getLoggedUser()
     setUser(user)
-    setAdmin(user?.roles.length > 0 && user.roles[0] === 'ROLE_ADMIN')
+    setAdmin(user?.roles?.length > 0 && user.roles[0] === 'ROLE_ADMIN')
   }, [setCart, setUser, setAdmin])
 
   useEffect(() => {
@@ -140,26 +153,27 @@ export default function Smoothie() {
               <Button
                 size="large"
                 onClick={handleClickPurchase}
-                startIcon={
-                  <SvgIcon fontSize="small">
-                    <use xlinkHref="#icon-wallet" />
-                  </SvgIcon>
-                }
               >
                 Purchase now
               </Button>
               { isAdmin && (
-                <Button
-                  size="large"
-                  onClick={handleClickEdit}
-                  startIcon={
-                    <SvgIcon fontSize="small">
-                      <use xlinkHref="#icon-wallet" />
-                    </SvgIcon>
-                  }
-                >
-                  EDIT
-                </Button>
+                <>
+                  <Button
+                    size="large"
+                    onClick={handleClickEdit}
+                  >
+                    EDIT
+                  </Button>
+                  <Button
+                    size="large"
+                    onClick={handleClickDelete}
+                    color="error"
+                  >
+                    DELETE
+                  </Button>
+                
+                </>
+                
               )}
             </Box>
           </Grid>
