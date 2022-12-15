@@ -148,8 +148,33 @@ export default function Smoothie() {
                 fontWeight={500}
                 sx={{ my: 4 }}
               >
-                {smoothie?.nutritions}
+                Calories: {smoothie?.nutritions?.calories}
               </Typography>
+              <Typography
+                variant="body1"
+                color="text.secondary"
+                fontWeight={500}
+                sx={{ my: 4 }}
+              >
+                Proteins: {smoothie?.nutritions?.proteins}
+              </Typography>
+              <Typography
+                variant="body1"
+                color="text.secondary"
+                fontWeight={500}
+                sx={{ my: 4 }}
+              >
+                Fat: {smoothie?.nutritions?.fat}
+              </Typography>
+              <Typography
+                variant="body1"
+                color="text.secondary"
+                fontWeight={500}
+                sx={{ my: 4 }}
+              >
+                Carbs: {smoothie?.nutritions?.carbs}
+              </Typography>
+
               <Button
                 size="large"
                 onClick={handleClickPurchase}

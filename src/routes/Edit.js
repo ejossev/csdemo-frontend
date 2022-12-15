@@ -28,16 +28,20 @@ export default function Edit() {
   const navigate = useNavigate()
   const [errorMsg, setErrorMsg] = useState("")
   const [smoothie, setSmoothie] = useState(null)
-  console.log(id)
 
-  const handleEdit = async (e) => {
+  const handleEdit = useCallback(async (e) => {
     e.preventDefault()
-    const body = JSON.stringify({
+
+    const body = {
       name: e.currentTarget.name.value,
       description: e.currentTarget.description.value,
-      nutritions: e.currentTarget.nutritions.value
-    })
-
+      nutritions: {
+        calories: e.currentTarget.calories.value,
+        carbs: e.currentTarget.carbs.value,
+        proteins: e.currentTarget.proteins.value,
+        fat: e.currentTarget.fat.value
+      }
+    }
 
     let res
     try {
@@ -47,16 +51,18 @@ export default function Edit() {
           {
             method: 'POST',
             headers: { "Content-Type": "application/json"},
-            body
+            body: JSON.stringify(body)
           }
         )
       } else {
+        if (!body.name)
+          body.name = smoothie.name
         res = await authorizedFetch(
           SMOOTHY_URL_BASE + "/" + id,
           {
             method: 'PUT',
             headers: { "Content-Type": "application/json"},
-            body
+            body: JSON.stringify(body)
           }
         )
       }
@@ -65,7 +71,7 @@ export default function Edit() {
     } catch (error) {
       console.error(error)
     }
-  }
+  }, [smoothie])
 
   const fetchSmoothie = useCallback(async () => {
     if (!id)
@@ -113,12 +119,28 @@ export default function Edit() {
               name="description"
             />
             <TextField
-              placeholder="Nutritions"
+              placeholder="Calories"
               fullWidth
-              multiline
-              rows={4}
-              label="nutritions"
-              name="nutritions"
+              label="calories"
+              name="calories"
+            />
+            <TextField
+              placeholder="Proteins"
+              fullWidth
+              label="proteins"
+              name="proteins"
+            />
+            <TextField
+              placeholder="Fat"
+              fullWidth
+              label="fat"
+              name="fat"
+            />
+            <TextField
+              placeholder="Carbs"
+              fullWidth
+              label="carbs"
+              name="carbs"
             />
             <Button type="submit" variant="outlined">
               Submit
